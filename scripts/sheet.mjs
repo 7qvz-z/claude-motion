@@ -7,7 +7,7 @@
 //   node scripts/sheet.mjs --from 3 --to 5 --every 0.2   scrub a transition
 //
 // Options: --video out/draft.mp4 (default: newest of out/draft.mp4, out/effort.mp4)
-//          --offset 0.3  --cols 4  --rows 2  --size 540  --name beats
+//          --timeline timeline.json  --offset 0.3  --cols 4  --rows 2  --size 540  --name beats
 import {execFileSync} from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -27,6 +27,7 @@ const newest = ['out/draft.mp4', 'out/effort.mp4']
   .filter((p) => fs.existsSync(p))
   .sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs)[0];
 const video = path.resolve(opt('video', newest ?? ''));
+const timelinePath = path.resolve(opt('timeline', path.join(ROOT, 'timeline.json')));
 const offset = Number(opt('offset', '0.3'));
 const every = opt('every', null);
 const from = Number(opt('from', '0'));
@@ -46,7 +47,7 @@ const probe = (args) =>
 const duration = Number(probe(['-show_entries', 'format=duration']));
 
 const beats = () => {
-  const tl = JSON.parse(fs.readFileSync(path.join(ROOT, 'timeline.json'), 'utf8'));
+  const tl = JSON.parse(fs.readFileSync(timelinePath, 'utf8'));
   const out = [];
   const walk = (v, key) => {
     if (key === 'fps' || key === 'duration') return;

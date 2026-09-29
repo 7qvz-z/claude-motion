@@ -53,12 +53,13 @@ export const sp = (
   frame: number,
   startSec: number,
   config: Partial<SpringConfig> = {},
+  fps: number = FPS,
 ) => {
-  const fr = frame - startSec * FPS;
+  const fr = frame - startSec * fps;
   if (fr <= 0) return 0;
   return spring({
     frame: fr,
-    fps: FPS,
+    fps,
     config: {damping: 14, mass: 0.8, stiffness: 140, ...config},
   });
 };

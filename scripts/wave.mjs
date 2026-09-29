@@ -3,6 +3,7 @@
 //
 //   node scripts/wave.mjs                 public/sfx.wav → out/wave.png
 //   node scripts/wave.mjs out/effort.mp4  measure the final mux instead
+//   --timeline other.json                 beats from another timeline (default timeline.json)
 //
 // Every hit in the waveform should sit on (or a hair after) a beat line.
 import {execFileSync, spawnSync} from 'node:child_process';
@@ -10,7 +11,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
-const input = path.resolve(process.argv[2] ?? path.join(ROOT, 'public', 'sfx.wav'));
+const argv = process.argv.slice(2);
+const ti = argv.indexOf('--timeline');
+const timelinePath = path.resolve(ti === -1 ? path.join(ROOT, 'timeline.json') : argv.splice(ti, 2)[1]);
+const input = path.resolve(argv[0] ?? path.join(ROOT, 'public', 'sfx.wav'));
 if (!fs.existsSync(input)) {
   console.error(`${path.relative(ROOT, input)} not found. Run \`npm run sfx\` first.`);
   process.exit(1);
@@ -21,7 +25,7 @@ const MAX_TRUE_PEAK = -1;
 const W = 1800;
 const H = 280;
 
-const tl = JSON.parse(fs.readFileSync(path.join(ROOT, 'timeline.json'), 'utf8'));
+const tl = JSON.parse(fs.readFileSync(timelinePath, 'utf8'));
 const beats = [];
 const walk = (v, key) => {
   if (key === 'fps' || key === 'duration') return;
@@ -57,5 +61,5 @@ const peak = Number(summary.match(/Peak:\s+(-?[\d.]+) dBFS/)?.[1]);
 console.log(`waveform: ${path.relative(ROOT, png)} (${beats.length} beats in coral, grid = 1s)`);
 console.log(`loudness: ${lufs} LUFS integrated (target ${TARGET_LUFS} ±1)`);
 console.log(`true peak: ${peak} dBFS (keep ≤ ${MAX_TRUE_PEAK})`);
-if (Math.abs(lufs - TARGET_LUFS) > 1) console.warn('WARN loudness off target: adjust master gain in scripts/sfx.py');
+if (Math.abs(lufs - TARGET_LUFS) > 1) console.warn('WARN loudness off target: re-run the cue sheet, check TARGET_LUFS');
 if (peak > MAX_TRUE_PEAK) console.warn('WARN true peak too hot: AAC encoding may clip, lower the master ceiling');

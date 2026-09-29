@@ -18,11 +18,11 @@ One revision afterwards:
 
 ## Process
 
-| Step | Time |
-|---|---|
-| Prompt → first cut (15 s, sound included) | ~34 min |
-| Revision → final cut (22 s) | ~8 min |
-| Model | Claude Opus 5.5 |
+| Step                                       | Time            |
+| ------------------------------------------ | --------------- |
+| Prompt → first cut (15 s, sound included) | ~30 min        |
+| Revision → final cut (22 s)               | ~8 min          |
+| Model                                      | Claude Opus 5.5 |
 
 What the agent did on its own: storyboard into `timeline.json`, scene components, procedural sound from the same timeline, contact-sheet review of every beat, a loudness pass to −14 LUFS, and a re-check of the transition that started colliding after the retime (the prompt bar hitting the outgoing title at 3.7 s).
 

@@ -1,27 +1,32 @@
 # claude-motion
 
-**Remotion skills teach Claude the API. This repo teaches it taste.**
+**A motion design toolkit for coding agents.** Remotion skills teach your agent the API. This teaches it taste, makes it check its own frames, and gives it a sound engine.
+
+Works with Claude Code and Cursor out of the box (skills in `.claude/skills/`), and with Codex, OpenCode or anything else that reads `AGENTS.md`.
 
 <p align="center">
-  <img src="media/preview.gif" width="480" alt="22-second motion graphic made by Claude with this repo" />
+  <img src="media/preview.gif" width="480" alt="22-second motion graphic made by Claude with this toolkit" />
 </p>
+
+<p align="center"><sub>Made by Claude with this toolkit from one prompt and one revision. No After Effects, no stock sounds. <a href="examples/01-effort/">How it was made →</a></sub></p>
 
 <!-- For the version with sound: open this README in the GitHub editor, drag out/effort.mp4 in, and GitHub will turn it into an inline player. -->
 
-The video above was made by Claude from one prompt: *"make a dynamic 15-second motion graphics video that shows what an incredible motion designer you are"*, plus one revision. No After Effects, no timeline editor, no stock sounds. [How it was made →](examples/01-effort/)
+## What your agent gets
 
-## What's inside
+**Motion rules with numbers.** Easing curves, spring presets, stagger, reading holds, type scale, one-accent color, texture, motivated transitions. Not "make it smooth": `bezier(0.16, 1, 0.3, 1)` for entrances, exits at half the duration, 0.09 s between words. → [`motion-design`](.claude/skills/motion-design/SKILL.md)
 
-- **Motion design rules with numbers.** Easing curves, spring presets, stagger, reading holds, type scale, one-accent color, texture, motivated transitions. Not "make it smooth": `bezier(0.16, 1, 0.3, 1)` for entrances, exits at half the duration, 0.09 s word stagger.
-- **A visual self-review loop.** Claude renders a draft, builds contact sheets at every beat, looks at them, checks a list (collisions, clipping, holds, safe area, phone readability) and fixes what it finds before telling you it's done.
-- **Sound design synced to every cut.** One `timeline.json` drives both picture and audio. All sound is procedural (no samples, no licensing), mastered to −14 LUFS, with a waveform check that shows every hit landing on its beat.
-- **A finished reference piece** with reusable components: masked text reveals, rolling numbers, prompt bar with typing, a spring-loaded slider, film grain, hand-drawn line boil.
+**A self-review loop.** Agents can't watch video, but they can look at frames. The agent renders a draft, gets a contact sheet with one timestamped frame per beat, checks it against a list (collisions, clipping, holds, safe area, phone readability) and fixes what it finds before saying it's done. → [`review-loop`](.claude/skills/review-loop/SKILL.md)
 
-Works with Claude Code and Cursor out of the box (skills in `.claude/skills/`), and with Codex / OpenCode / anything that reads `AGENTS.md`.
+**A sound engine.** Pure Python stdlib, no samples, no licenses. Generators for typing, clicks, pops, whooshes, risers, chimes, impacts, textures and pads; a mixer that places sounds on the same timeline as the picture; mastering that hits −14 LUFS by itself. The agent writes one cue sheet per video and adds generators when it needs a new sound. → [`sound-design`](.claude/skills/sound-design/SKILL.md)
+
+**One timeline for everything.** Every beat is a named timestamp in a JSON file. Scenes, sound and review all read it, so retiming the video retimes the sound and the checks with it.
+
+**A reference piece to take apart.** The video above, with reusable components: masked text reveals, rolling numbers, film grain, hand-drawn line boil, a background with drifting grid and glow.
 
 ## Quick start
 
-**Let your agent do it.** Paste this into Claude Code, Cursor, Codex or OpenCode:
+**Let your agent set it up.** Paste this into Claude Code, Cursor, Codex or OpenCode:
 
 ```text
 Clone https://github.com/YOUR_USERNAME/claude-motion and cd into it.
@@ -35,47 +40,67 @@ Then read AGENTS.md and the skills in .claude/skills/, and ask me what video I w
 ```bash
 git clone https://github.com/YOUR_USERNAME/claude-motion && cd claude-motion
 npm install
-npm run build        # → out/effort.mp4
+npm run build        # the example video with sound → out/effort.mp4
 npm run studio       # live preview
 ```
 
-Then ask your agent for a video. It will pick up the skills on its own.
+Then ask for a video:
 
-## The pipeline
-
-```
- idea ─► timeline.json ─┬─► React scenes ─► npm run draft ─► npm run sheet ─► look, fix ─┐
-        (every beat)    │                                                                │
-                        │                        ◄─────────────── repeat ────────────────┘
-                        └─► scripts/sfx.py ─► npm run wave (sync + loudness)
-                                                   │
-                                     npm run build ─► out/effort.mp4
+```text
+Make a 15-second 1080×1080 motion graphic announcing <your thing>.
+Follow AGENTS.md: storyboard first, then the timeline, review loop, sound.
 ```
 
-| Command | |
+## How the agent works
+
+```
+ idea ─► storyboard ─► timeline.json ─┬─► scenes ─► draft ─► contact sheet ─► look, fix ─┐
+                       (every beat)   │                                                  │
+                                      │                  ◄──────── repeat ───────────────┘
+                                      └─► cue sheet ─► python3 -m sfx ─► waveform + LUFS
+                                                                │
+                                                 render + mux ─► final MP4
+```
+
+| Tool | |
 |---|---|
-| `npm run studio` | live preview |
-| `npm run draft` | fast half-res render |
-| `npm run sheet` | contact sheets at every beat (`-- --from 3 --to 5 --every 0.2` to scrub a transition) |
-| `npm run sfx` | regenerate sound from the timeline |
-| `npm run wave` | waveform with beat markers + LUFS / true peak |
-| `npm run build` | final render with sound |
-| `npm run gif` | README preview |
-| `npm run cover` | 5:2 cover for an X Article, drawn from the same timeline |
+| `npm run studio` | live preview of every composition |
+| `npm run sheet -- --video <mp4>` | contact sheets at every beat (`--from 3 --to 5 --every 0.2` to scrub a transition) |
+| `python3 -m sfx --list` | sound generators and what each is for |
+| `python3 -m sfx sfx/cues/<name>.py` | render a cue sheet to a mastered WAV |
+| `npm run wave -- <wav or mp4>` | waveform with beat markers, LUFS and true peak |
+| `npm run build` | the example, end to end: sound, render, mux |
 
 <p align="center">
-  <img src="media/sheet.png" width="720" alt="Contact sheet Claude reviews: one frame per timeline beat" /><br/>
-  <sub>What Claude looks at: one tile per beat, labelled with its timestamp.</sub>
+  <img src="media/sheet.png" width="720" alt="Contact sheet the agent reviews: one frame per timeline beat" /><br/>
+  <sub>What the agent looks at: one tile per beat, labelled with its timestamp.</sub>
 </p>
+
+## The sound engine
+
+A cue sheet is one Python function. Every time comes from the timeline:
+
+```python
+from sfx.synth import pop, whoosh
+
+def score(mix, tl):
+    s1 = tl["s1"]
+    mix.put(s1["title"], whoosh(0.4, 500, 2400, peak=0.45), 0.12)
+    for i, t in enumerate(s1["items"]):
+        mix.put(t, pop(900 + i * 150, 400), 0.3, pan=-0.4 + i * 0.3)
+    mix.typing(s1["typeStart"], s1["typeEnd"], chars=24)
+```
+
+`python3 -m sfx sfx/cues/<name>.py` renders it, masters it to −14 LUFS with the true peak kept under −2 dBFS, and writes the WAV. [`sfx/cues/effort.py`](sfx/cues/effort.py) is the full sound design of the example: 128 sounds and a pad.
 
 <p align="center">
   <img src="media/wave.png" width="720" alt="Waveform with timeline beats in coral" /><br/>
-  <sub>Sound check: every coral line is a beat from timeline.json.</sub>
+  <sub>Sync check: every coral line is a beat from the timeline, and every hit sits on one.</sub>
 </p>
 
 ## Effort levels for motion work
 
-What I use with Opus 5.5 (`/effort` in Claude Code):
+What works with Claude Opus 5.5 (`/effort` in Claude Code):
 
 | Stage | Effort | Why |
 |---|---|---|
@@ -95,7 +120,7 @@ Nothing here needs MCP. These add real capabilities; copy `.mcp.json.example` to
 | [Playwright](https://github.com/microsoft/playwright-mcp) | screenshots of a real product UI to animate |
 | [Figma](https://help.figma.com/hc/en-us/articles/32132100833559) | pull frames and design tokens straight from your file |
 
-Pair it with the official [Remotion agent skills](https://www.remotion.dev/docs/ai/skills) for API coverage; this repo is about the design layer on top.
+Pair it with the official [Remotion agent skills](https://www.remotion.dev/docs/ai/skills) for API coverage; this toolkit is the design layer on top.
 
 ## Gallery
 

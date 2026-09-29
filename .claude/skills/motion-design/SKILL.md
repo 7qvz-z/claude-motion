@@ -9,7 +9,7 @@ Remotion teaches you the API. This file is the taste. Every number below comes f
 
 ## 1. Time lives in `timeline.json`
 
-- Every beat is a named timestamp in seconds in `timeline.json`, grouped by scene (`s1`, `s2`, …). Components read it through `TL` from `src/lib.ts`; `scripts/sfx.py` reads the same file. That is what keeps picture and sound locked.
+- Every beat is a named timestamp in seconds in `timeline.json`, grouped by scene (`s1`, `s2`, …). Components read it through `TL` from `src/lib.ts`; the video's cue sheet in `sfx/cues/` reads the same file. That is what keeps picture and sound locked.
 - Never hardcode a start time inside a component. Offsets relative to a beat (`s1.exit + 0.05`) are fine.
 - Retiming = editing `timeline.json`, then `npm run sfx` so audio follows.
 - Everything is a pure function of `frame`. No CSS transitions or keyframes, no `Math.random()` (use `rand(n)`), no `Date`. Anything else flickers or drifts at render time.

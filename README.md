@@ -29,7 +29,7 @@ Works with Claude Code and Cursor out of the box (skills in `.claude/skills/`), 
 **Let your agent set it up.** Paste this into Claude Code, Cursor, Codex or OpenCode:
 
 ```text
-Clone https://github.com/YOUR_USERNAME/claude-motion and cd into it.
+Clone https://github.com/whaleyxbt/claude-motion and cd into it.
 Check that Node 20+, Python 3 and ffmpeg are installed; install whatever is missing.
 Run `npm install` and `npm run build`, then show me out/effort.mp4.
 Then read AGENTS.md and the skills in .claude/skills/, and ask me what video I want to make next.
@@ -38,7 +38,7 @@ Then read AGENTS.md and the skills in .claude/skills/, and ask me what video I w
 **Or by hand:**
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/claude-motion && cd claude-motion
+git clone https://github.com/whaleyxbt/claude-motion && cd claude-motion
 npm install
 npm run build        # the example video with sound → out/effort.mp4
 npm run studio       # live preview

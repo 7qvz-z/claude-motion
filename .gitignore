@@ -6,3 +6,4 @@ __pycache__/
 .mcp.json
 .env
 drafts/
+sims/dist/

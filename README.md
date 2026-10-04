@@ -1,6 +1,6 @@
 # claude-motion
 
-**A motion design toolkit for coding agents.** Remotion skills teach your agent the API. This teaches it taste, makes it check its own frames, and gives it a sound engine.
+**A motion design toolkit for coding agents.** Remotion skills teach your agent the API. This teaches it taste, makes it check its own frames, and gives it a sound engine. And when the idea is a simulation, not a motion graphic, it renders web sims frame by frame to 60 fps video.
 
 Works with Claude Code and Cursor out of the box (skills in `.claude/skills/`), and with Codex, OpenCode or anything else that reads `AGENTS.md`.
 
@@ -11,6 +11,38 @@ Works with Claude Code and Cursor out of the box (skills in `.claude/skills/`), 
 <p align="center"><sub>Made by Claude with this toolkit from one prompt and one revision. No After Effects, no stock sounds. <a href="examples/01-effort/">How it was made →</a></sub></p>
 
 <!-- For the version with sound: open this README in the GitHub editor, drag out/effort.mp4 in, and GitHub will turn it into an inline player. -->
+
+## New: web sims → 60 fps video
+
+<p align="center">
+  <img src="media/sims/crawlers.gif" width="250" alt="256 spider agents crawling a wall of websites" />
+  <img src="media/sims/dossier.gif" width="250" alt="Agents turning one username into a dossier with red threads" />
+  <img src="media/sims/engine.gif" width="250" alt="Camera flying through a running rocket engine's chamber" />
+</p>
+
+<p align="center"><sub>Made by Claude with this toolkit. Left: <a href="https://x.com/whaleyxbt/status/2106099822088331481">the crawler swarm</a> (340K+ views on X). Middle: <a href="https://x.com/whaleyxbt/status/2106420024286031963">one username → a dossier</a>. Right: a rocket engine explorer with a fly-through and an exploded view.</sub></p>
+
+Some videos are simulations: 256 agents doubling on the beat, a rocket engine the camera flies through. Those are easier to write as a web page than as React, so [`sims/`](sims/) is a second pipeline:
+
+- **One HTML page per piece**, three.js and fonts inlined, works offline. Open it and it plays live.
+- **`render(t)` is a pure function of time.** Agents and physics are simulated once at load, so any frame can be drawn on demand.
+- **Frame-exact capture.** Headless Chromium steps the page frame by frame into ffmpeg: 60 fps at 1440×1800 (or any size), no matter how slow a frame is.
+- **Cuts on the beat.** `beats.py` finds the tempo, bars and drop of a track and hands them to the sim.
+- **Three examples to take apart:** [`crawlers`](sims/crawlers/), [`dossier`](sims/dossier/), [`engine`](sims/engine/) (with its sound generated in Python).
+
+```bash
+npm install && npx playwright install chromium
+npm run sims                                                    # → sims/dist/<name>.html
+npm run capture -- engine --size 1080x1350 --out out/engine.mp4  # 1440×1800, 60 fps
+```
+
+Ask your agent:
+
+```text
+Read sims/README.md and the web-sims skill. Build a 20-second sim of <your idea>
+as one HTML page at 1080×1350. Review it with --stills before you render,
+then capture it to a 60 fps mp4.
+```
 
 ## What your agent gets
 
@@ -33,6 +65,7 @@ Clone https://github.com/whaleyxbt/claude-motion and cd into it.
 Check that Node 20+, Python 3 and ffmpeg are installed; install whatever is missing.
 Run `npm install` and `npm run build`, then show me out/effort.mp4.
 Then read AGENTS.md and the skills in .claude/skills/, and ask me what video I want to make next.
+(For simulations and 3D, also run `npx playwright install chromium` and read sims/README.md.)
 ```
 
 **Or by hand:**

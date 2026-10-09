@@ -34,5 +34,8 @@
     "playwright": "1.63.0",
     "three": "0.186.1",
     "typescript": "5.9.3"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true
   }
 }
